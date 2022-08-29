@@ -1,55 +1,45 @@
-const playground = document.querySelector(".playground > ul");
+const canvas = document.getElementById("tetris");
+const context = canvas.getContext('2d');
 
-// setting
-const GAME_LOWS = 20;
-const GAME_COL = 10;
+context.scale(20,20);
 
-//variables
-let score = 50;
-let duration = 500;
-let downInterval;
-let tempMovingItem; 
+const matrix = [
+    [0, 0, 0],
+    [1, 1, 1],
+    [0, 1, 0]
+];
 
-const BLOCKS = {
-    tree:[
-        [[0,0], [0,1], [1,0], [1,1]],
-        [[1,2], [5,6], [6,6], [7,7]],
-        [],
-        []
-    ]
+function draw() {
+    context.fillStyle = '#000';
+    context.fillRect(0,0,canvas.width,canvas.height);
+    drawMatrix(player.matrix, player.pos);
+}
+
+function drawMatrix(matrix, offset){
+    matrix.forEach((row,y) => {
+        row.forEach((value,x) => {
+            if(value !== 0) {
+                context.fillStyle = 'red';
+                context.fillRect(x + offset.x, y + offset.y, 1, 1);
+            }
+        })
+    });
 };
 
-const movingItem = {
-    type: "tree",
-    direction: 0,
-    top:0,
-    left:0,
-};
-init()
+let dropCounter = 0;
+let dropInterval = 1000;
 
-function init() {
-    tempMovingItem =  {...movingItem};
-    for (let i=0; i<20; i++) {
-        prependNewLine();
-    }
-    renderBlocks()
+let lastTime = 0;
+function update(time=0) {
+    const deltaTime = time - lastTime;
+    lastTime = time;
+    dropCounter += deltaTime;
+    draw();
+    requestAnimationFrame(update);
 }
 
-function prependNewLine() {
-    const li = document.createElement("li");
-    const ul = document.createElement("ul");
-    for(let j=0; j<10; j++){
-        const matrix = document.createElement("li");
-        ul.prepend(matrix);
-    }
-    li.prepend(ul);
-    playground.prepend(li);
+const player = {
+    pos : {x: 5,y: 5},
+    matrix: matrix,
 }
-function renderBlocks() {
-    const { type, direction, top, left} = tempMovingItem;
-    BLOCKS[type][direction].forEach(block => {
-        const x = block[0];
-        const y = block[1];
-        console.log(tempMovingItem);
-    })
-}
+update();
